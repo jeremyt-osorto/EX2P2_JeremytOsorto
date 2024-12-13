@@ -13,6 +13,16 @@ public class Pokemon {
     private int nivel;
     private double ataque, defensa, catchRate, vida;
 
+    public Pokemon(String nombre, String tipo, double ataque, double defensa, double catchRate, double vida) {
+        this.nombre = nombre;
+        this.tipo = tipo;
+        this.ataque = ataque;
+        this.defensa = defensa;
+        this.catchRate = catchRate;
+        this.vida = vida;
+        this.nivel=1;
+    }
+
     public double getVida() {
         return vida;
     }
@@ -67,6 +77,11 @@ public class Pokemon {
 
     public void setCatchRate(double catchRate) {
         this.catchRate = catchRate;
+    }
+
+    @Override
+    public String toString() {
+        return "nombre= " + nombre + "\ntipo= " + tipo + "\nnivel= " + nivel + "\nataque= " + ataque + "\ndefensa= " + defensa + "\ncatchRate= " + catchRate + "\nvida= " + vida;
     }
     
     
