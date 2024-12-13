@@ -18,17 +18,90 @@ public class EX2P2_JeremytOsorto {
     static Scanner lee=new Scanner(System.in);
     static Scanner in=new Scanner(System.in);
     static Random ran=new Random();
+    static int tam=pokemonCreado.size();
+    static int r=ran.nextInt(tam);
     
     /**
      * @param args the command line arguments
      */
-    private static void atraparP(Pokemon atrapar, Trainer ent){
-        int atp=ran.nextInt(100)+1, p=1;
+    private static String atraparP(Pokemon atrapar, Trainer ent, int p){
+        double atp=ran.nextDouble(100)+1;
+        ent.setPokeballs(ent.getPokeballs()-1);
         
-        
-        if (p==2 && ent.getPokeballs()<0){
+        if (p==0 || ent.getPokeballs()<0){
             System.out.println("No se ha podido atrapar el pokemon");
+            return "";
         }
+        if (atp<=atrapar.getCatchRate()){
+            pokemonAtrapado.add(atrapar);
+            System.out.println("Se pudo atrapar el "+atrapar.getNombre()+" salvaje!");
+            return "";
+        }
+        else{
+            System.out.println("El "+atrapar.getNombre()+" salvaje escapo de la pokebola! deseas intentar otra vez? (1-si, 0-no)");
+            System.out.println("Pokebolas : "+ent.getPokeballs());
+            p=in.nextInt();
+            return atraparP(atrapar, ent, p);
+        }
+        
+    }
+    
+    private static void batalla(Pokemon atta, Pokemon deff, boolean turno, Trainer ent){
+        
+        if (atta.getVida()<=0){
+            System.out.println("Tu pokemon ha sido derrotado :(");
+            ent.setDinero(ent.getDinero()-1000);
+            atta.setNivel(atta.getNivel()-3);
+            
+            if (ent.getDinero()<0){
+                ent.setDinero(0);
+            }
+            if (atta.getNivel()<1){
+                atta.setNivel(1);
+            }
+        }
+        
+        if (deff.getVida()<=0){
+            System.out.println("El pokemon salvaje ha sido derrotado");
+            int subn=ran.nextInt(1,4);
+            atta.setNivel(atta.getNivel()+subn);
+            ent.setDinero(ent.getDinero()+ran.nextInt(600,801));
+        }
+        
+        double da=cal(deff, atta, turno);
+        
+        if (turno){
+            deff.setVida(deff.getVida()-da);
+            System.out.println(atta.getNombre()+" ataca a "+deff.getNombre()+" y recibe "+da+" de daño");
+        }
+        else{
+            da=cal(atta,deff,!turno);
+            atta.setVida(atta.getVida()-da);
+            System.out.println(deff.getNombre()+" ataca a "+atta.getNombre()+" y recibe "+da+" de daño");
+        }
+        
+        batalla(atta, deff, !turno,ent);
+    }
+    
+    private static double cal(Pokemon ata, Pokemon def, boolean turno){
+        double dab= ata.getAtaque()+20*ata.getNivel()-def.getDefensa()/2;
+        double daf=dab;
+        
+        String tip=ata.getTipo();
+        String tip1=def.getTipo();
+        
+        if ((tip.equalsIgnoreCase("Fuego") && tip1.equalsIgnoreCase("Planta")) || (tip.equalsIgnoreCase("Planta") && tip1.equalsIgnoreCase("Agua")) || (tip.equalsIgnoreCase("Agua") && tip1.equalsIgnoreCase("Fuego"))){
+            daf*=1.5;
+        }
+        else if ((tip1.equalsIgnoreCase("Fuego") && tip.equalsIgnoreCase("Planta")) || (tip1.equalsIgnoreCase("Planta") && tip.equalsIgnoreCase("Agua")) || (tip1.equalsIgnoreCase("Agua") && tip.equalsIgnoreCase("Fuego"))){
+            daf/=2;
+        }
+        
+        if (daf<0){
+            daf=0;
+        }
+        
+        return daf;
     }
     
     public static void main(String[] args) {
@@ -114,12 +187,12 @@ public class EX2P2_JeremytOsorto {
                     }
                     else{
                         System.out.println("ha encontrado un pokemon");
-                        int r=ran.nextInt(0,pokemonAtrapado.size());
-                        Pokemon atrapar=pokemonAtrapado.get(r);
+                        int p=1;
+                        Pokemon atrapar=pokemonCreado.get(r);
                         
                         System.out.println("Es un "+atrapar.getNombre()+" salvaje!");
                         System.out.println("Pokebolas : "+ent.getPokeballs());
-                        atraparP(atrapar, ent);
+                        atraparP(atrapar, ent, p);
                     }
                     break;
                 case 3:
@@ -209,8 +282,27 @@ public class EX2P2_JeremytOsorto {
                         System.out.println("No hay pokemones atrapados");
                         System.out.println("------------------------");
                     }
+                    else if (pokemonCreado.size()<2){
+                        System.out.println("-------------------------------------------");
+                        System.out.println("Debe tener dos o mas pokemones creados");
+                        System.out.println("-------------------------------------------");
+                    }
                     else {
-                        System.out.println("Hacelo");
+                        System.out.println("-------------------------------------------");
+                        System.out.println("Ingrese el indice del pokemon a entrenar");
+                        int int1=in.nextInt();
+                        
+                        if (int1<0 || int1>=pokemonAtrapado.size()){
+                            System.out.println("Ingrese un indice valido");
+                        }
+                        
+                        Pokemon selec=pokemonAtrapado.get(int1);
+                        Pokemon cont=pokemonCreado.get(r);
+                        
+                        System.out.println("Tu batalla es contra "+cont.getNombre()+" salvaje!");
+                        batalla(selec, cont, true, ent);
+                        
+                        System.out.println("-------------------------------------------");
                     }
                     break;
                 case 5:
